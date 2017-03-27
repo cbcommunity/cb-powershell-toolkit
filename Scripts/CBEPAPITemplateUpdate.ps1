@@ -47,7 +47,7 @@ $timespan = New-TimeSpan -Minutes $timeout
 $Computer = [CBEPComputer]::new()
 $Template = [CBEPTemplate]::new()
 
-$Computer.Get($computerName, "", $session)
+$Computer.Get($computerName, $null, $session)
 
 If ($Computer.computer.length -gt 1){
     Write-Error -Message ("Multiple computers with the same name detected. Please remediate and try again.")
@@ -61,7 +61,7 @@ While ($stopWatch.ElapsedMilliseconds -lt $timespan.TotalMilliseconds){
         Break
     }
     Start-Sleep -Seconds 25
-    $Computer.Get("", $Computer.computer.Id, $session)
+    $Computer.Get($null, $Computer.computer.Id, $session)
 }
 
 If ($Computer.computer.connected -eq "True"){
@@ -73,9 +73,9 @@ If ($Computer.computer.syncPercent -lt '100'){
     Return
 }
 
-$Template.Get("", $Computer.computer.templateComputerId, $session)
+$Template.Get($null, $Computer.computer.templateComputerId, $session)
 $Template.Delete($Template.template.Id, $session)
 $Computer.Convert($Computer.computer.Id, $session)
-$Template.Get("", $Computer.computer.Id, $session)
+$Template.Get($null, $Computer.computer.Id, $session)
 
 $Template.template
