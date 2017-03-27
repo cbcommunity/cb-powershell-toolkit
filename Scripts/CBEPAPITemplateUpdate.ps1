@@ -4,13 +4,17 @@ using module ..\Classes\CBEPAPISessionClass.psm1
 
 <#
         .SYNOPSIS
-        Use this as a template for all scripts created to use with the toolkit
+        This script is designed to be used with a VDI environment to automate template updates.
         .DESCRIPTION
-        Uncomment out any modules are you using in this script and leave the code to check the credentials for the session
-        .PARAMETER temp
-
+        This script uses the CB Protection API to automate the deletion and creation of templates so that child machines start up with the most recent catalog and have the most recent file list in CBEP.
+        In order to accomplish this, the target "golden image" needs to be fully synchronized and needs to be powered off. Once that is done, the script will delete the old template and create
+        a new one based on the powered off computer.
+        .PARAMETER computerName
+        string - This is the name of your "golden image" machine
+        .PARAMETER timeout
+        system.int32 - This is the time in minutes that the script should wait for the machine to be ready to convert to a template. The defaut value is 1 minute.
         .EXAMPLE
-
+        .\CBEPAPITemplateUpdate.ps1 -computerName GOLDEN_IMAGE -timeout 5
         .NOTES
         CB Protection API Tools for PowerShell v2.0
         Copyright (C) 2017 Thomas Brackin
