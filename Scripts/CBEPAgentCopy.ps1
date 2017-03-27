@@ -31,6 +31,7 @@ $webserver = "YOUR_WEBSERVER_HERE"
 $hosturi = "https://YOUR_URL_HERE"
 # Path on DMZ web server
 $destinationPath = "\\$webserver\d$\CBEP Agents\"
+$serverInstallPath = "\\$cbepdmzserver\D$\Program Files (x86)\Bit9\Parity Server\"
 
 # XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 # DO NOT EDIT THE BELOW VARIABLES
@@ -39,11 +40,11 @@ $destinationPath = "\\$webserver\d$\CBEP Agents\"
 # Old URI for ServerIP
 $serveripuri = "https://**ServerIP**/hostpkg/pkg.php?pkg=/"
 # XML file and backup paths
-$XMLFile = "\\$cbepdmzserver\D$\Program Files (x86)\Bit9\Parity Server\upgrade\upgrade.xml"
-$XMLBackup = "\\$cbepdmzserver\D$\Program Files (x86)\Bit9\Parity Server\upgrade\upgradebackup.xml"
+$XMLFile = $serverInstallPath + "upgrade\upgrade.xml"
+$XMLBackup = $serverInstallPath + "upgrade\upgradebackup.xml"
 # Paths to CBEP DMZ server files
-$macAgentPathSource = "\\$cbepdmzserver\d$\Program Files (x86)\Bit9\Parity Server\hostpkg\Bit9MacInstall.bsx"
-$windowsHostAgentPathSource = "\\$cbepdmzserver\d$\Program Files (x86)\Bit9\Parity Server\hostpkg\ParityHostAgent.msi"
+$macAgentPathSource = $serverInstallPath + "\hostpkg\Bit9MacInstall.bsx"
+$windowsHostAgentPathSource = $serverInstallPath + "\hostpkg\ParityHostAgent.msi"
 
 # Copy the installers to the new destinations
 Copy-Item -Path $macAgentPathSource -Destination $destinationPath
