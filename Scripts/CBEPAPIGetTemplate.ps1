@@ -1,4 +1,4 @@
-using module ..\Classes\CBEPAPIComputerClass.psm1
+using module ..\Classes\CBEPAPITemplateClass.psm1
 using module ..\Classes\CBEPAPISessionClass.psm1
 
 <#
