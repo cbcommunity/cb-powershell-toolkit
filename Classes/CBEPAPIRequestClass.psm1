@@ -40,7 +40,7 @@ class CBEPRequest{
         elseif ($unopened){
             $this.approvalRequest = $null
             $urlQueryPart = "/approvalRequest?q=status:1"
-            $this.approvalRequest = $session.getQuery($urlQueryPart)
+            $this.approvalRequest = $session.get($urlQueryPart)
         }
     }
 
