@@ -14,8 +14,9 @@
 # This class is for creating a session object that holds the relevant session data for the api connection
 # It also includes the methods for a GET and PUSH on the Restful API call
 class CBEPSession{
-    [system.object]$apiHeader
+    [system.object]$apiHeader = @{}
     [string]$apiUrl
+    [securestring]$apiKey
 
     # Parameters required: none
     # Returns: Object - The response code information from the test connection to the session
@@ -31,21 +32,18 @@ class CBEPSession{
             return $null
         }
 
-        # Decrypt strings
+        # Decrypt url and create variable
         $Marshal = [System.Runtime.InteropServices.Marshal]
-        $BstrUrl = $Marshal::SecureStringToBSTR(($apiConfigTemp.url | ConvertTo-SecureString))
-        $BstrKey = $Marshal::SecureStringToBSTR(($apiConfigTemp.key | ConvertTo-SecureString))
-        $keyTemp = $Marshal::PtrToStringAuto($BstrKey)
+        $BstrUrl = $Marshal::SecureStringToBSTR(($apiConfigTemp.url | ConvertTo-SecureString))      
         $urlTemp = $Marshal::PtrToStringAuto($BstrUrl)
-
-        $this.apiHeader = @{}
-        $this.apiHeader.Add("X-Auth-Token", $keyTemp)
         $this.apiUrl = "https://$urlTemp/api/bit9platform/v1"
+
+        # Convert encrypted api key to a secure string and save to a variable
+        $this.apiKey = ConvertTo-SecureString $apiConfigTemp.key
 
         # Free encrypted variables from memory
         $Marshal::ZeroFreeBSTR($BstrUrl)
-        $Marshal::ZeroFreeBSTR($BstrKey)
-
+        
         # Test the session start
         $tempResponse = @{}
         try{
@@ -70,6 +68,11 @@ class CBEPSession{
     # This method will do a get query on the api
     [system.object] Get ([string]$urlQueryPart){
         $tempResponse = @{}
+        
+        # Unencrypt the secure string for the key and create a header object
+        $Marshal = [System.Runtime.InteropServices.Marshal]
+        $this.apiHeader.'X-Auth-Token' = $Marshal::PtrToStringAuto($Marshal::SecureStringToBSTR($this.apiKey))
+
         try{
             $responseObject = Invoke-RestMethod -Headers $this.apiHeader -Method Get -Uri ($this.apiUrl + $urlQueryPart)
         }
@@ -82,6 +85,10 @@ class CBEPSession{
             $tempResponse.Add("HttpDescription", $statusDescription)
             $responseObject = $tempResponse
         }
+
+        # Null out the unencrypted header
+        $this.apiHeader = @{}
+
         return $responseObject
     }
 
@@ -90,6 +97,11 @@ class CBEPSession{
     # This method will do a post query to the api
     [system.object] Post ([string]$urlQueryPart, [system.object]$jsonObject){
         $tempResponse = @{}
+
+        # Unencrypt the secure string for the key and create a header object
+        $Marshal = [System.Runtime.InteropServices.Marshal]
+        $this.apiHeader.'X-Auth-Token' = $Marshal::PtrToStringAuto($Marshal::SecureStringToBSTR($this.apiKey))
+
         try{
             $responseObject = Invoke-RestMethod -Headers $this.apiHeader -Method Post -Uri ($this.apiUrl + $urlQueryPart) -Body $jsonObject -ContentType 'application/json'
         }
@@ -102,6 +114,10 @@ class CBEPSession{
             $tempResponse.Add("HttpDescription", $statusDescription)
             $responseObject = $tempResponse
         }
+
+        # Null out the unencrypted header
+        $this.apiHeader = @{}
+
         return $responseObject
     }
 
@@ -110,6 +126,11 @@ class CBEPSession{
     # This method will do a post query to the api
     [system.object] Put ([string]$urlQueryPart, [system.object]$jsonObject){
         $tempResponse = @{}
+
+        # Unencrypt the secure string for the key and create a header object
+        $Marshal = [System.Runtime.InteropServices.Marshal]
+        $this.apiHeader.'X-Auth-Token' = $Marshal::PtrToStringAuto($Marshal::SecureStringToBSTR($this.apiKey))
+
         try{
             $responseObject = Invoke-RestMethod -Headers $this.apiHeader -Method Put -Uri ($this.apiUrl + $urlQueryPart) -Body $jsonObject -ContentType 'application/json'
         }
@@ -122,6 +143,10 @@ class CBEPSession{
             $tempResponse.Add("HttpDescription", $statusDescription)
             $responseObject = $tempResponse
         }
+
+        # Null out the unencrypted header
+        $this.apiHeader = @{}
+
         return $responseObject
     }
 }
