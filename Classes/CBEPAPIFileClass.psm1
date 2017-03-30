@@ -156,7 +156,7 @@ class CBEPFile{
     #                      $hash	-	Hash associated with this rule. This parameter is not required if fileCatalogId is supplied
     #                      $platformFlags	-	Set of platform flags where this file rule will be valid. combination of: 1 = Windows, 2 = Mac, 4 = Linux
     # This method will create a new rule for a file based on the information given
-    [void]CreateRule ([string]$fileCatalogId, [string]$name, [string]$description, [string]$fileState, [string]$reportOnly, [string]$reputationApprovalsEnabled, [string]$forceInstaller, [string]$forceNotInstaller, [string]$policyIds, [string]$hash, [string]$platformFlags, [system.object]$session){
+    [void] CreateRule ([string]$fileCatalogId, [string]$name, [string]$description, [string]$fileState, [string]$reportOnly, [string]$reputationApprovalsEnabled, [string]$forceInstaller, [string]$forceNotInstaller, [string]$policyIds, [string]$hash, [string]$platformFlags, [system.object]$session){
         $this.fileRule.fileCatalogId = $fileCatalogId
         $this.fileRule.name = $name
         $this.fileRule.description = $description
@@ -175,4 +175,20 @@ class CBEPFile{
         $this.fileRule = @{}
     }
 
+    [system.object] Upload ([system.int32]$computerId, [system.int32]$fileCatalogId, [system.int32]$priority, [system.int32]$uploadStatus, [system.object]$session){
+        [system.object]$fileUploadRequest = @{}
+        $fileUploadRequest.computerId = $computerId
+        $fileUploadRequest.fileCatalogId = $fileCatalogId
+        $fileUploadRequest.priority = $priority
+        $fileUploadRequest.uploadStatus = $uploadStatus
+
+        $urlQueryPart = "/fileUpload"
+        $jsonObject = ConvertTo-Json -InputObject $fileUploadRequest
+        return $session.post($urlQueryPart, $jsonObject)
+    }
+
+    [System.IO.FileInfo] Download ([system.int32]$uploadId, [system.object]$session){
+        $urlQueryPart = "/fileUpload/" + $uploadId + "?downloadFile=True"
+        return $session.getFile($urlQueryPart)
+    }
 }
