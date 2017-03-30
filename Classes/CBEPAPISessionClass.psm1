@@ -93,6 +93,25 @@ class CBEPSession{
     }
 
     # Parameters required:  $urlQueryPart - the query part of the API call based on the API documentation
+    # Returns:              $responseFile - the file that is returned from the API GET call
+    # This method will do a get query on the api
+    [System.IO.FileInfo] GetFile ([string]$urlQueryPart){
+        $tempResponse = @{}
+        [System.IO.FileInfo]$responseFile = $null
+        
+        # Unencrypt the secure string for the key and create a header object
+        $Marshal = [System.Runtime.InteropServices.Marshal]
+        $this.apiHeader.'X-Auth-Token' = $Marshal::PtrToStringAuto($Marshal::SecureStringToBSTR($this.apiKey))
+
+        $responseFile = Invoke-RestMethod -Headers $this.apiHeader -Method Get -Uri ($this.apiUrl + $urlQueryPart)
+
+        # Null out the unencrypted header
+        $this.apiHeader = @{}
+
+        return $responseFile
+    }
+
+    # Parameters required:  $urlQueryPart - the query part of the API call based on the API documentation
     # Returns:              $responseObject - the object that is returned from the API POST call
     # This method will do a post query to the api
     [system.object] Post ([string]$urlQueryPart, [system.object]$jsonObject){
