@@ -19,4 +19,5 @@ $object.GetSomethingCool('variable1','variable2','variable3)
 
 
 ## Future implements
-1. File analysis class
+-[x] File analysis class
+-[ ] Create VirusTotal script for performing analysis and making decisions based on the results.
