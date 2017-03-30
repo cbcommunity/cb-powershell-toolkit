@@ -16,6 +16,7 @@
 class CBEPFile{
     [system.object]$fileCatalog
     [system.object]$fileInstance
+    [system.object]$fileRule = @{}
 
     # Parameters required:  $fileCatalogId - this is the ID of a file in the catalog
     #                       $session - this is a session object from the CBEPSession class
@@ -141,4 +142,37 @@ class CBEPFile{
         ($this.fileCatalog | Where-Object {$_.id -eq $fileCatalogId}).fileState = 3
         $this.UpdateGlobal($fileCatalogId, $session)
     }
+
+    # Parameters required: $session - this is a session object from the CBEPSession class
+    # Parameters optional: $fileCatalogId	-	Id of fileCatalog entry associated with this fileRule. Can be 0 if creating/modifying rule based on hash or file name
+    #                      $name	-	Name of this rule
+    #                      $description	-	Description of this rule
+    #                      $fileState	-	File state for this rule. Can be one of: 1=Unapproved, 2=Approved, 3=Banned
+    #                      $reportOnly	-	Set to true to create a report-only ban. Note: fileState has to be set to 1 (unapproved) before this flag can be set
+    #                      $reputationApprovalsEnabled	-	True if reputation approvals are enabled for this file
+    #                      $forceInstaller	-	True if this file is forced to act as installer, even if product detected it as 'not installer'
+    #                      $forceNotInstaller	-	True if this file is forced to act as 'not installer', even if product detected it as installer
+    #                      $policyIds	-	List of IDs of policies where this rule applies. Value should be empty if this is a global rule
+    #                      $hash	-	Hash associated with this rule. This parameter is not required if fileCatalogId is supplied
+    #                      $platformFlags	-	Set of platform flags where this file rule will be valid. combination of: 1 = Windows, 2 = Mac, 4 = Linux
+    # This method will create a new rule for a file based on the information given
+    [void]CreateRule ([string]$fileCatalogId, [string]$name, [string]$description, [string]$fileState, [string]$reportOnly, [string]$reputationApprovalsEnabled, [string]$forceInstaller, [string]$forceNotInstaller, [string]$policyIds, [string]$hash, [string]$platformFlags, [system.object]$session){
+        $this.fileRule.fileCatalogId = $fileCatalogId
+        $this.fileRule.name = $name
+        $this.fileRule.description = $description
+        $this.fileRule.fileState = $fileState
+        $this.fileRule.reportOnly = $reportOnly
+        $this.fileRule.reputationApprovalsEnabled = $reputationApprovalsEnabled
+        $this.fileRule.forceInstaller = $forceInstaller
+        $this.fileRule.forceNotInstaller = $forceNotInstaller
+        $this.fileRule.policyIds = $policyIds
+        $this.fileRule.hash = $hash
+        $this.fileRule.platformFlags = $platformFlags
+
+        $urlQueryPart = "/fileRule"
+        $jsonObject = ConvertTo-Json -InputObject $this.fileRule
+        $session.post($urlQueryPart, $jsonObject)
+        $this.fileRule = @{}
+    }
+
 }
