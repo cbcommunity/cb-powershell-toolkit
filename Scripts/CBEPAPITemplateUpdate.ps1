@@ -36,7 +36,7 @@ Param(
     [string[]]$computerName
 )
 # Change this value (in seconds) if you want to wait longer for the computer to show disconnected
-[system.int32]$timeout = 1
+[system.int32]$timeout = 30
 
 # Start default session block
 # Create a session and make sure it works
