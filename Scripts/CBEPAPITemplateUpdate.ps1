@@ -86,4 +86,4 @@ $Template.Delete($Template.template.Id, $session)
 $Computer.Convert($Computer.computer.Id, $session)
 $Template.Get($null, $Computer.computer.Id, $session)
 
-$Template.template
+Write-Output $Template.template

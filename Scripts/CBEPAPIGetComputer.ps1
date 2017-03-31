@@ -50,4 +50,4 @@ $Computer = [CBEPComputer]::new()
 
 $Computer.Get($computerName, $null, $Session)
 
-Write-Out $Computer.computer
+Write-Output $Computer.computer

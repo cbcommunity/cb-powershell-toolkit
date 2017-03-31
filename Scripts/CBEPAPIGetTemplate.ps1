@@ -48,6 +48,6 @@ If ($sessionResult.HttpStatus -ne '200'){
 
 $Template = [CBEPTemplate]::new()
 
-$tempComputer = $Template.Get($computerName, $Session)
+$Template.Get($computerName, $Session)
 
-Write-Out $tempComputer
+Write-Output $Template.template
