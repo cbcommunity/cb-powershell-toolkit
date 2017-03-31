@@ -1,5 +1,5 @@
 # CB Protection API Toolkit for PowerShell
-This toolkit was written specifically for PowerShell 5.1. As such, it uses code that is NOT compatible with anything below 5.0. There could potentially be issues if you use 5.0 as I have only tested it in 5.1.
+This toolkit was written specifically for PowerShell 5.1. As such, it uses code that is NOT compatible with anything below 5.0.
 
 ## How to use
 Import these modules with the new import method introduced in PowerShell 5.0
