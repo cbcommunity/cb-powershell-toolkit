@@ -1,3 +1,5 @@
+#requires -version 5.0
+
 using module ..\Classes\CBEPAPIComputerClass.psm1
 using module ..\Classes\CBEPAPITemplateClass.psm1
 using module ..\Classes\CBEPAPISessionClass.psm1
@@ -10,22 +12,24 @@ using module ..\Classes\CBEPAPISessionClass.psm1
         In order to accomplish this, the target "golden image" needs to be fully synchronized and needs to be powered off. Once that is done, the script will delete the old template and create
         a new one based on the powered off computer.
         .PARAMETER computerName
-        string - This is the name of your "golden image" machine
+        [string] - This is the name of your "golden image" machine
         .PARAMETER timeout
-        system.int32 - This is the time in minutes that the script should wait for the machine to be ready to convert to a template. The defaut value is 1 minute.
+        [system.int32] - This is the time in minutes that the script should wait for the machine to be ready to convert to a template. The defaut value is 1 minute.
         .EXAMPLE
-        .\CBEPAPITemplateUpdate.ps1 -computerName GOLDEN_IMAGE -timeout 5
+        C: <PS> .\CBEPAPITemplateUpdate.ps1 -computerName GOLDEN_IMAGE -timeout 5
         .NOTES
-        CB Protection API Tools for PowerShell v2.0
+        CB PowerShell Toolkit v2.0
         Copyright (C) 2017 Thomas Brackin
 
-        Requires: Powershell v5.1
-
-        Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+        Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction,
+        including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software,
+        and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
         The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+        
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+        IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+        ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #>
 
 Param(
@@ -34,13 +38,13 @@ Param(
         ValueFromPipeline=$true,
         ValueFromPipelineByPropertyName=$true
     )]
-    [string[]]$computerName
+    [string[]]$computerName,
+    [Parameter(
+    )]
+    [system.int32]$timeout = 1
 )
-# Change this value (in seconds) if you want to wait longer for the computer to show disconnected
-[system.int32]$timeout = 1
 
 # Start default session block
-# Create a session and make sure it works
 $Session = [CBEPSession]::new()
 $sessionResult = $Session.Initialize()
 If ($sessionResult.HttpStatus -ne '200'){
@@ -83,4 +87,4 @@ $Template.Delete($Template.template.Id, $session)
 $Computer.Convert($Computer.computer.Id, $session)
 $Template.Get($null, $Computer.computer.Id, $session)
 
-$Template.template
+Write-Output $Template.template
