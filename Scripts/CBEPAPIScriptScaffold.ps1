@@ -1,4 +1,4 @@
-#requires -version 5
+#requires -version 5.0
 
 # using module ..\Classes\CBEPAPIComputerClass.psm1
 # using module ..\Classes\CBEPAPIEventClass.psm1

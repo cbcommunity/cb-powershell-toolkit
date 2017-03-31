@@ -1,4 +1,4 @@
-#requires -version 5
+#requires -version 5.0
 
 <#
     CB PowerShell Toolkit v2.0

@@ -1,4 +1,4 @@
-#requires -version 5
+#requires -version 5.0
 
 using module ..\Classes\CBEPAPITemplateClass.psm1
 using module ..\Classes\CBEPAPISessionClass.psm1
