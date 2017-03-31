@@ -13,6 +13,7 @@
 
 # This class is for creating a request object that can hold an array of requests from the api
 # It also includes some methods to manipulate the requests
+
 class CBEPRequest{
     [system.object]$approvalRequest
 
