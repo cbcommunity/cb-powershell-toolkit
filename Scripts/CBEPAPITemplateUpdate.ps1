@@ -37,7 +37,7 @@ Param(
         Mandatory=$true,
         ValueFromPipeline=$true
     )]
-    [string[]]$computerName
+    [string[]]$computerName,
     [Parameter(
     )]
     [system.int32]$timeout = 1
