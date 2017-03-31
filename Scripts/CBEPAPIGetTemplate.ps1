@@ -33,7 +33,8 @@ using module ..\Classes\CBEPAPISessionClass.psm1
 Param(
     [Parameter(
         Mandatory=$true,
-        ValueFromPipeline=$true
+        ValueFromPipeline=$true,
+        ValueFromPipelineByPropertyName=$true
     )]
     [string[]]$computerName
 )
@@ -48,6 +49,6 @@ If ($sessionResult.HttpStatus -ne '200'){
 
 $Template = [CBEPTemplate]::new()
 
-$tempComputer = $Template.Get($computerName, $Session)
+$Template.Get($computerName, $Session)
 
-Write-Out $tempComputer
+Write-Output $Template.template

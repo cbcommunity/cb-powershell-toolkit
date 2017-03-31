@@ -33,7 +33,8 @@ using module ..\Classes\CBEPAPISessionClass.psm1
 Param(
     [Parameter(
         Mandatory=$true,
-        ValueFromPipeline=$true
+        ValueFromPipeline=$true,
+        ValueFromPipelineByPropertyName=$true
     )]
     [string[]]$computerName
 )

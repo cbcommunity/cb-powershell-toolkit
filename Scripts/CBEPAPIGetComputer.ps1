@@ -33,7 +33,8 @@ using module ..\Classes\CBEPAPISessionClass.psm1
 Param(
     [Parameter(
         Mandatory=$true,
-        ValueFromPipeline=$true
+        ValueFromPipeline=$true,
+        ValueFromPipelineByPropertyName=$true
     )]
     [string[]]$computerName
 )
@@ -50,4 +51,4 @@ $Computer = [CBEPComputer]::new()
 
 $Computer.Get($computerName, $null, $Session)
 
-Write-Out $Computer.computer
+Write-Output $Computer.computer
