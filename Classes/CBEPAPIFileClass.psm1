@@ -1,14 +1,18 @@
+#requires -version 5.0
+
 <#
-    CB Protection API Tools for PowerShell v2.0
+    CB PowerShell Toolkit v2.0
     Copyright (C) 2017 Thomas Brackin
 
-    Requires: Powershell v5.1
-
-    Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+    Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction,
+    including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software,
+    and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
     The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+    
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+    ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #>
 
 # This class is for creating a file object that can hold both local and global file information
@@ -16,7 +20,6 @@
 class CBEPFile{
     [system.object]$fileCatalog
     [system.object]$fileInstance
-    [system.object]$fileRule = @{}
 
     # Parameters required:  $fileCatalogId - this is the ID of a file in the catalog
     #                       $session - this is a session object from the CBEPSession class
@@ -156,23 +159,48 @@ class CBEPFile{
     #                      $hash	-	Hash associated with this rule. This parameter is not required if fileCatalogId is supplied
     #                      $platformFlags	-	Set of platform flags where this file rule will be valid. combination of: 1 = Windows, 2 = Mac, 4 = Linux
     # This method will create a new rule for a file based on the information given
-    [void]CreateRule ([string]$fileCatalogId, [string]$name, [string]$description, [string]$fileState, [string]$reportOnly, [string]$reputationApprovalsEnabled, [string]$forceInstaller, [string]$forceNotInstaller, [string]$policyIds, [string]$hash, [string]$platformFlags, [system.object]$session){
-        $this.fileRule.fileCatalogId = $fileCatalogId
-        $this.fileRule.name = $name
-        $this.fileRule.description = $description
-        $this.fileRule.fileState = $fileState
-        $this.fileRule.reportOnly = $reportOnly
-        $this.fileRule.reputationApprovalsEnabled = $reputationApprovalsEnabled
-        $this.fileRule.forceInstaller = $forceInstaller
-        $this.fileRule.forceNotInstaller = $forceNotInstaller
-        $this.fileRule.policyIds = $policyIds
-        $this.fileRule.hash = $hash
-        $this.fileRule.platformFlags = $platformFlags
+    [void] CreateRule ([string]$fileCatalogId, [string]$name, [string]$description, [string]$fileState, [string]$reportOnly, [string]$reputationApprovalsEnabled, [string]$forceInstaller, [string]$forceNotInstaller, [string]$policyIds, [string]$hash, [string]$platformFlags, [system.object]$session){
+        [system.object]$fileRule = @{}
+        $fileRule.fileCatalogId = $fileCatalogId
+        $fileRule.name = $name
+        $fileRule.description = $description
+        $fileRule.fileState = $fileState
+        $fileRule.reportOnly = $reportOnly
+        $fileRule.reputationApprovalsEnabled = $reputationApprovalsEnabled
+        $fileRule.forceInstaller = $forceInstaller
+        $fileRule.forceNotInstaller = $forceNotInstaller
+        $fileRule.policyIds = $policyIds
+        $fileRule.hash = $hash
+        $fileRule.platformFlags = $platformFlags
 
         $urlQueryPart = "/fileRule"
-        $jsonObject = ConvertTo-Json -InputObject $this.fileRule
+        $jsonObject = ConvertTo-Json -InputObject $fileRule
         $session.post($urlQueryPart, $jsonObject)
-        $this.fileRule = @{}
     }
 
+    # Parameters required: $session - this is a session object from the CBEPSession class 
+    # Parameters optional: $computerId - Id of computer from which to upload the file. If 0, system will find best computer to get the file from
+    #                      $fileCatalogId - Id of fileCatalog entry for file to upload
+    #                      $priority - Upload priority in range [-2, 2], where 2 is highest priority. Default priority is 0
+    #                      $uploadStatus - Status of upload. Status of upload in progress can be changed to 5 (Cancelled). Any upload can be changed to 6 (Deleted)
+    # This method will pull a file from a computer to the CBEP server. It also has the capability of cancelling and deleting the upload based on modifying upload status
+    [system.object] Upload ([system.int32]$computerId, [system.int32]$fileCatalogId, [system.int32]$priority, [system.int32]$uploadStatus, [system.object]$session){
+        [system.object]$fileUploadRequest = @{}
+        $fileUploadRequest.computerId = $computerId
+        $fileUploadRequest.fileCatalogId = $fileCatalogId
+        $fileUploadRequest.priority = $priority
+        $fileUploadRequest.uploadStatus = $uploadStatus
+
+        $urlQueryPart = "/fileUpload"
+        $jsonObject = ConvertTo-Json -InputObject $fileUploadRequest
+        return $session.post($urlQueryPart, $jsonObject)
+    }
+
+    # Parameters required: $uploadId - id of a requested fileUpload
+    #                      $session - this is a session object from the CBEPSession class
+    # This method will download a file from the CBEP server and return it
+    [System.IO.FileInfo] Download ([system.int32]$uploadId, [system.object]$session){
+        $urlQueryPart = "/fileUpload/" + $uploadId + "?downloadFile=True"
+        return $session.getFile($urlQueryPart)
+    }
 }
