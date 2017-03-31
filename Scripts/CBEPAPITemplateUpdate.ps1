@@ -35,9 +35,10 @@ using module ..\Classes\CBEPAPISessionClass.psm1
 Param(
     [Parameter(
         Mandatory=$true,
-        ValueFromPipeline=$true
+        ValueFromPipeline=$true,
+        ValueFromPipelineByPropertyName=$true
     )]
-    [string[]]$computerName
+    [string[]]$computerName,
     [Parameter(
     )]
     [system.int32]$timeout = 1
@@ -86,4 +87,4 @@ $Template.Delete($Template.template.Id, $session)
 $Computer.Convert($Computer.computer.Id, $session)
 $Template.Get($null, $Computer.computer.Id, $session)
 
-$Template.template
+Write-Output $Template.template
