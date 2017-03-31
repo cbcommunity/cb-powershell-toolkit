@@ -77,6 +77,7 @@ class CBEPComputer{
             }
         }
     }
+    
     # Parameters required:  $computerID - this is the ID of a computer
     #                       $session - this is a session object from the CBEPSession class
     # This method will use an open session to update the request with a PUT for the conversion to a template
