@@ -1,3 +1,5 @@
+#requires -version 4.0
+
 <#
         .SYNOPSIS
         This script is inteded to be ran after a CB Protection server update to copy the installers to a separate web server
@@ -6,17 +8,21 @@
         In this scenario, 443 access is blocked from the outside to protect the console from outside access. Due to this, an external webserver is needed to host the
         update files to allow the agents to still update normally after the server version has updated. For more information on this architecture, please consult the
         CB Protection document 'Cb Protection - Always-Connected Agents.pdf'.
+        .EXAMPLE
+        CBEPAgentCopy.ps1
         .NOTES
-        CB Protection API Tools for PowerShell v2.0
+        CB PowerShell Toolkit v2.0
         Copyright (C) 2017 Thomas Brackin
 
-        Requires: Powershell v5.1
-
-        Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+        Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction,
+        including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software,
+        and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
         The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+        
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+        IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+        ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #>
 
 # XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -31,6 +37,7 @@ $webserver = "YOUR_WEBSERVER_HERE"
 $hosturi = "https://YOUR_URL_HERE"
 # Path on DMZ web server
 $destinationPath = "\\$webserver\d$\CBEP Agents\"
+$serverInstallPath = "\\$cbepdmzserver\D$\Program Files (x86)\Bit9\Parity Server\"
 
 # XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 # DO NOT EDIT THE BELOW VARIABLES
@@ -39,11 +46,11 @@ $destinationPath = "\\$webserver\d$\CBEP Agents\"
 # Old URI for ServerIP
 $serveripuri = "https://**ServerIP**/hostpkg/pkg.php?pkg=/"
 # XML file and backup paths
-$XMLFile = "\\$cbepdmzserver\D$\Program Files (x86)\Bit9\Parity Server\upgrade\upgrade.xml"
-$XMLBackup = "\\$cbepdmzserver\D$\Program Files (x86)\Bit9\Parity Server\upgrade\upgradebackup.xml"
+$XMLFile = $serverInstallPath + "upgrade\upgrade.xml"
+$XMLBackup = $serverInstallPath + "upgrade\upgradebackup.xml"
 # Paths to CBEP DMZ server files
-$macAgentPathSource = "\\$cbepdmzserver\d$\Program Files (x86)\Bit9\Parity Server\hostpkg\Bit9MacInstall.bsx"
-$windowsHostAgentPathSource = "\\$cbepdmzserver\d$\Program Files (x86)\Bit9\Parity Server\hostpkg\ParityHostAgent.msi"
+$macAgentPathSource = $serverInstallPath + "\hostpkg\Bit9MacInstall.bsx"
+$windowsHostAgentPathSource = $serverInstallPath + "\hostpkg\ParityHostAgent.msi"
 
 # Copy the installers to the new destinations
 Copy-Item -Path $macAgentPathSource -Destination $destinationPath

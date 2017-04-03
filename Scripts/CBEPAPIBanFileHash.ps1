@@ -1,20 +1,19 @@
 #requires -version 5.0
 
-using module ..\Classes\CBEPAPIComputerClass.psm1
+using module ..\Classes\CBEPAPIFileClass.psm1
 using module ..\Classes\CBEPAPISessionClass.psm1
 
 <#
         .SYNOPSIS
-        This script takes in a computer name and deletes it from CBEP
+        This script takes in a hash and an optional name and creates a file ban rule in CBEP
         .DESCRIPTION
-        This script will delete a computer from CBEP as long as the computer is turned off. It looks for a computer name just as it appears in the console.
-        For example, if your computers are all on a domain called DOMAINABC, the computer name would look like this: DOMAINABC\Computer1
-        The input can accept wildcards if you don't want to add the full name OR if you want to delete multiple computers with a common set of characters.
-        .PARAMETER computerName
-        The name of the computer you wish to delete. Wildcards are accepted.
+        This script is intented for use in the CB Protection Powershell Toolkit. It will globally ban any hash given using a file rule.
+        .PARAMETER hash
+        [string] - This variable can be either an MD5 hash or SHA256 hash
+        .PARAMETER name
+        [string] - This is the name of the file or any other name you choose to mark the hash rule
         .EXAMPLE
-        C: <PS> .\CBEPAPIDeleteComputer.ps1 -computername *computer00*
-        This will delete any computer matching the characters with the wildcards before and after the string
+        C: <PS> .\CBEPAPIBanFileHash -hash 1234567891234567890 -name FileBan1
         .NOTES
         CB PowerShell Toolkit v2.0
         Copyright (C) 2017 Thomas Brackin
@@ -24,20 +23,28 @@ using module ..\Classes\CBEPAPISessionClass.psm1
         and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
         The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-        
+
         THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
         IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
         ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #>
 
 Param(
-    [Parameter(
-        Mandatory=$true,
-        ValueFromPipeline=$true,
-        ValueFromPipelineByPropertyName=$true
+    [parameter(
+        Mandatory = $true,
+        ValueFromPipeline = $true
     )]
-    [string[]]$computerName
+    [string]$hash,
+    [parameter(
+        Mandatory = $false,
+        ValueFromPipeline =$true
+    )]
+    [string]$name
 )
+
+If (!$name){
+    $name = $hash
+}
 
 # Start default session block
 $Session = [CBEPSession]::new()
@@ -47,10 +54,5 @@ If ($sessionResult.HttpStatus -ne '200'){
 }
 # End default session block
 
-$Computer = [CBEPComputer]::new()
-
-$Computer.Get($computerName, $null, $Session)
-
-ForEach ($machine in $Computer.computer){
-    $Computer.Delete($machine.id, $Session)
-}
+$File = [CBEPFile]::new()
+$File.CreateRule('0', $name, $null, '3', $null, $null, $null, $null, $null, $hash, '7')
